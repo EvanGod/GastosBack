@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const db = require('./db');
 const app = express.Router();
 const userRoutes = require('./routes/users');
+const gastosRoutes = require('./routes/gastos'); // Importar rutas de gastos
 const PORT = process.env.PORT || 3000;
 
 const verifyToken = require('./middlewares/verifyToken'); // Ruta al middleware
@@ -18,6 +19,7 @@ app.use(bodyParser.json());
 
 // Rutas de usuarios
 app.use('/api/users', userRoutes);
+app.use('/api/gastos', gastosRoutes); // Rutas de gastos
 
 // Ruta base
 app.get('/', (req, res) => {
