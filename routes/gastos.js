@@ -38,7 +38,7 @@ const verifyToken = (req, res, next) => {
 // Ruta para agregar un gasto
 router.post('/add', verifyToken, upload.single('imagen_recibo'), async (req, res) => {
   const { monto, descripcion, ubicacion } = req.body;
-  const usuario_id = req.userId; // Usamos el ID del usuario del token
+  const usuario_id = req.id; // Usamos el ID del usuario del token
 
   if (!monto || !descripcion || !usuario_id) {
     return res.status(400).json({ message: 'Los campos monto, descripcion y usuario_id son requeridos' });
