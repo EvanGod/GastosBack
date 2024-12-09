@@ -1,18 +1,22 @@
 const jwt = require('jsonwebtoken');
+const dotenv = require('dotenv');
 
-const verifyToken = (req, res, next) => {
-  const token = req.header('Authorization');
-  if (!token) {
-    return res.status(403).json({ message: 'Acceso denegado' });
+dotenv.config();
+const jwtSecret = process.env.JWT_SECRET;
+
+module.exports = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ message: 'No se proporcionó un token' });
   }
 
-  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-    if (err) {
-      return res.status(403).json({ message: 'Token no válido' });
-    }
-    req.user = decoded; // Guarda la información del usuario decodificada
+  const token = authHeader.split(' ')[1];
+  try {
+    const decoded = jwt.verify(token, jwtSecret);
+    req.user = decoded; // Añadimos el usuario decodificado a la solicitud
     next();
-  });
+  } catch (error) {
+    res.status(401).json({ message: 'Token inválido' });
+  }
 };
-
-module.exports = verifyToken;

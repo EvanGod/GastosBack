@@ -1,43 +1,22 @@
 const express = require('express');
-const multer = require('multer');
-const path = require('path');
 const jwt = require('jsonwebtoken');
 const db = require('../db');
 const router = express.Router();
+const verifyToken = require('../middlewares/verifyToken');
 
-// Configuración de Multer para guardar imágenes
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'public/assets'); // Carpeta donde se almacenarán las imágenes
-  },
-  filename: (req, file, cb) => {
-    const gastoId = req.body.gastoId; // Usamos el ID del gasto
-    cb(null, `gasto-${gastoId}-${Date.now()}${path.extname(file.originalname)}`);
-  },
-});
+// Ruta para agregar un gasto (sin imagen)
+router.post('/add', verifyToken, async (req, res) => {
+  const { monto, descripcion, ubicacion, imagen_recibo } = req.body; // El frontend enviará el nombre de la imagen (opcional)
+  const usuario_id = req.user.id; // ID del usuario del token
 
-const upload = multer({ storage: storage });
-
-
-
-// Ruta para agregar un gasto
-router.post('/add', upload.single('imagen_recibo'), async (req, res) => {
-  const { monto, descripcion, ubicacion } = req.body;
-  const usuario_id = req.id; // Usamos el ID del usuario del token
-
-  if (!monto || !descripcion || !usuario_id) {
-    return res.status(400).json({ message: 'Los campos monto, descripcion y usuario_id son requeridos' });
-  }
-
-  let imagenRecibo = null;
-  if (req.file) {
-    imagenRecibo = `/assets/${req.file.filename}`; // Ruta relativa de la imagen
+  if (!monto || !descripcion) {
+    return res.status(400).json({ message: 'Los campos monto y descripcion son requeridos' });
   }
 
   try {
     const [result] = await db.query(
       'INSERT INTO Gastos (usuario_id, monto, descripcion, fecha, ubicacion, imagen_recibo) VALUES (?, ?, ?, ?, ?, ?)',
-      [usuario_id, monto, descripcion, new Date(), ubicacion, imagenRecibo]
+      [usuario_id, monto, descripcion, new Date(), ubicacion, imagen_recibo]
     );
 
     res.status(201).json({ message: 'Gasto registrado con éxito', gastoId: result.insertId });
@@ -47,9 +26,9 @@ router.post('/add', upload.single('imagen_recibo'), async (req, res) => {
   }
 });
 
-// Ruta para obtener los gastos de un usuario
-router.get('/',  async (req, res) => {
-  const usuario_id = req.userId; // Usamos el ID del usuario del token
+// Ruta para obtener los gastos del usuario
+router.get('/', verifyToken, async (req, res) => {
+  const usuario_id = req.user.id; // ID del usuario del token
 
   try {
     const [gastos] = await db.query(
