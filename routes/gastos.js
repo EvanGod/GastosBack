@@ -48,7 +48,7 @@ router.post('/add', upload.single('imagen_recibo'), async (req, res) => {
 });
 
 // Ruta para obtener los gastos de un usuario
-router.get('/', verifyToken, async (req, res) => {
+router.get('/',  async (req, res) => {
   const usuario_id = req.userId; // Usamos el ID del usuario del token
 
   try {
