@@ -38,8 +38,4 @@ app.get('/api/test-db', (req, res) => {
     });
 });
 
-
-// Iniciar servidor
-app.listen(PORT, () => {
-    console.log(`Servidor corriendo en http://localhost:${PORT}`);
-});
+module.exports = app;
