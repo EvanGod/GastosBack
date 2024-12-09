@@ -18,25 +18,10 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-// Middleware para verificar el token y extraer el usuario ID
-const verifyToken = (req, res, next) => {
-  const token = req.headers['authorization'];
 
-  if (!token) {
-    return res.status(403).json({ message: 'Token no proporcionado' });
-  }
-
-  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-    if (err) {
-      return res.status(401).json({ message: 'Token no válido' });
-    }
-    req.userId = decoded.id; // Guardamos el id del usuario en la petición
-    next();
-  });
-};
 
 // Ruta para agregar un gasto
-router.post('/add', verifyToken, upload.single('imagen_recibo'), async (req, res) => {
+router.post('/add', upload.single('imagen_recibo'), async (req, res) => {
   const { monto, descripcion, ubicacion } = req.body;
   const usuario_id = req.id; // Usamos el ID del usuario del token
 
