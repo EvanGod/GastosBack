@@ -12,9 +12,7 @@ const verifyToken = require('./middlewares/verifyToken'); // Ruta al middleware
 
 
 // Middleware
-app.use(cors({
-    origin: 'http://localhost:8100' // Permite solo solicitudes desde localhost:8100
-  }));
+app.use(cors());
   
 app.use(bodyParser.json());
 
