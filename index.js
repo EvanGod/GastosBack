@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const db = require('./db');
-const app = express();
+const app = express.Router();
 const userRoutes = require('./routes/users');
 const PORT = process.env.PORT || 3000;
 
